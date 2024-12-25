@@ -17,17 +17,15 @@ private:
     vector<int> attendance;
 
 public:
-    // Constructor (Yapıcı)
+
     Student() {
         cout << "Student sınıfı oluşturuldu.\n";
     }
 
-    // Destructor (Yıkıcı)
     ~Student() {
         cout << "Student sınıfı yok edildi.\n";
     }
 
-    // Dosyadan öğrenci bilgilerini okuma
     void readFromCSV(const string& fileName) {
         ifstream file(fileName);
         if (!file.is_open()) {
@@ -40,7 +38,6 @@ public:
             stringstream ss(line);
             string value;
 
-            // Geçici değişkenler
             string name, studentNumber;
             float midterm = 0, secondExam = 0, assignment = 0, finalExam = 0;
             int attend = 0;
@@ -76,7 +73,6 @@ public:
                 continue;
             }
 
-            // Verileri vektörlere ekle
             names.push_back(name);
             studentNumbers.push_back(studentNumber);
             midterms.push_back(midterm);
@@ -89,7 +85,6 @@ public:
         file.close();
     }
 
-    // Ortalama hesaplama
     float average(int index) {
         return midterms[index] * 0.2f +
             secondExams[index] * 0.2f +
@@ -97,61 +92,64 @@ public:
             finals[index] * 0.4f;
     }
 
-    // Öğrenci listesini yazdırma metodu
-    void print(int filter = -1) {
-        cout << "\n=====================================\n";
-        if (filter == -1) {
-            cout << "Tüm Öğrenciler:\n";
-        }
-        else if (filter == 0) {
-            cout << "Kalan Öğrenciler (Ortalama < 50):\n";
-        }
-        else if (filter == 1) {
-            cout << "Geçen Öğrenciler (Ortalama >= 50):\n";
-        }
-        cout << "=====================================\n";
-
-        for (size_t i = 0; i < names.size(); ++i) {
-            float avg = average(i);
-            if ((filter == -1) || (filter == 0 && avg < 50) || (filter == 1 && avg >= 50)) {
-                cout << "Ad: " << names[i]
-                    << ", No: " << studentNumbers[i]
-                    << ", Ortalama: " << avg
-                    << ", Devam Sayisi: " << attendance[i] << endl;
+    // Öğrenci listesini yazdırma (ekrana veya dosyaya)
+    void print(const string& fileName = "", int filter = -1) {
+        // Eğer dosya adı verilmişse dosyaya yaz
+        if (!fileName.empty()) {
+            ofstream file(fileName);
+            if (!file.is_open()) {
+                cout << "Dosya açılmadı: " << fileName << endl;
+                return;
             }
-        }
-        cout << "=====================================\n";
-    }
 
-    // Öğrenci listesini dosyaya yazdırma
-    void print(const string& fileName, int filter = -1) {
-        ofstream file(fileName);
-        if (!file.is_open()) {
-            cout << "Dosya acilamadi: " << fileName << endl;
-            return;
-        }
-
-        if (filter == -1) {
-            file << "Tüm Öğrenciler:\n";
-        }
-        else if (filter == 0) {
-            file << "Kalan Öğrenciler (Ortalama < 50):\n";
-        }
-        else if (filter == 1) {
-            file << "Geçen Öğrenciler (Ortalama >= 50):\n";
-        }
-
-        for (size_t i = 0; i < names.size(); ++i) {
-            float avg = average(i);
-            if ((filter == -1) || (filter == 0 && avg < 50) || (filter == 1 && avg >= 50)) {
-                file << "Ad: " << names[i]
-                    << ", No: " << studentNumbers[i]
-                    << ", Ortalama: " << avg
-                    << ", Devam Sayisi: " << attendance[i] << "\n";
+            if (filter == -1) {
+                file << "Tüm Öğrenciler:\n";
             }
+            else if (filter == 0) {
+                file << "Kalan Öğrenciler (Ortalama < 50):\n";
+            }
+            else if (filter == 1) {
+                file << "Geçen Öğrenciler (Ortalama >= 50):\n";
+            }
+
+            for (size_t i = 0; i < names.size(); ++i) {
+                float avg = average(i);
+                if ((filter == -1) || (filter == 0 && avg < 50) || (filter == 1 && avg >= 50)) {
+                    file << "Ad: " << names[i]
+                        << ", No: " << studentNumbers[i]
+                        << ", Ortalama: " << avg
+                        << ", Devam Sayisi: " << attendance[i] << "\n";
+                }
+            }
+
+            file.close();
+            cout << "Sonuçlar dosyaya yazıldı: " << fileName << endl;
         }
-        cout << "Sonuçlar " << fileName << " dosyasına yazıldı.\n";
-        file.close();
+
+        else {
+            cout << "\n=====================================\n";
+            if (filter == -1) {
+                cout << "Tüm Öğrenciler:\n";
+            }
+            else if (filter == 0) {
+                cout << "Kalan Öğrenciler (Ortalama < 50):\n";
+            }
+            else if (filter == 1) {
+                cout << "Geçen Öğrenciler (Ortalama >= 50):\n";
+            }
+            cout << "=====================================\n";
+
+            for (size_t i = 0; i < names.size(); ++i) {
+                float avg = average(i);
+                if ((filter == -1) || (filter == 0 && avg < 50) || (filter == 1 && avg >= 50)) {
+                    cout << "Ad: " << names[i]
+                        << ", No: " << studentNumbers[i]
+                        << ", Ortalama: " << avg
+                        << ", Devam Sayisi: " << attendance[i] << endl;
+                }
+            }
+            cout << "=====================================\n";
+        }
     }
 };
 
@@ -160,24 +158,24 @@ int main() {
     Student student;
 
     // Öğrenci verilerini dosyadan oku
-    student.readFromCSV("C:\\Users\\AğaBaba\\OneDrive\\Masaüstü\\öğrenciler.txt");
+    student.readFromCSV("C:\\Users\\LEGEND\\Desktop\\oop-again\\proje\\girdi.cvs");
 
-    // Tüm öğrenciler (ekrana yazdır)
+    // Tüm öğrenciler ekrana yazdır
     student.print();
 
-    // Geçen öğrenciler (ekrana yazdır)
-    student.print(1);
+    // Geçen öğrenciler ekrana yazdır
+    student.print("", 1);
 
-    // Kalan öğrenciler (ekrana yazdır)
-    student.print(0);
+    // Kalan öğrenciler ekrana yazdır
+    student.print("", 0);
 
-    // Sonuçları bir dosyaya yazdır (tüm öğrenciler)
+    // Tüm öğrenciler dosyaya yazdır
     student.print("tum_ogrenciler.txt");
 
-    // Sonuçları bir dosyaya yazdır (geçen öğrenciler)
+    // Geçen öğrenciler dosyaya yazdır
     student.print("gecen_ogrenciler.txt", 1);
 
-    // Sonuçları bir dosyaya yazdır (kalan öğrenciler)
+    // Kalan öğrenciler dosyaya yazdır
     student.print("kalan_ogrenciler.txt", 0);
 
     return 0;
